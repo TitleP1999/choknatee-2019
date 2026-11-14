@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowDownRight, ArrowRight, Check, HardHat, Mail, MapPin, Phone, Truck } from "lucide-react";
 
+import { HomeMotion } from "@/components/home-motion";
 import { getContent } from "@/lib/content";
 export const dynamic = "force-dynamic";
 export default async function Home() {
@@ -10,7 +11,7 @@ export default async function Home() {
  const phone = content.contact.phone;
  const phoneHref = `tel:${phone.replace(/[^0-9+]/g, "")}`;
  const steps = content.process.steps.map(s => [s.number, s.title, s.description]);
- return <main>
+ return <main className="site-home"><HomeMotion/>
   <div className="topline"><span>บริการให้เช่าเครื่องจักรสำหรับงานของคุณ</span><a href={phoneHref}><Phone size={13}/> {phone}</a></div>
   <header className="header wrap"><a href="#top" className="brand"><img src={content.contact.logo} alt="โลโก้ โชคนที 2019"/><span><strong>โชคนที <b>2019</b></strong><small>CHOKNATEE 2019</small></span></a><nav aria-label="เมนูหลัก"><Button asChild variant="ghost"><a href="#services">บริการของเรา</a></Button><Button asChild variant="ghost"><a href="#fleet">ประเภทรถ</a></Button><Button asChild variant="ghost"><a href="#contact">ติดต่อเรา</a></Button></nav><Button asChild className="navcall"><a href={phoneHref} aria-label={`โทรสอบถาม ${phone}`}><Phone size={16}/> <span>โทรสอบถาม</span> <ArrowRight size={16}/></a></Button></header><nav className="mobile-nav" aria-label="เมนูบนมือถือ"><Button asChild variant="ghost"><a href="#services">บริการของเรา</a></Button><Button asChild variant="ghost"><a href="#fleet">ประเภทรถ</a></Button><Button asChild variant="ghost"><a href="#contact">ติดต่อเรา</a></Button></nav>
   <section className="hero" id="top"><div className="hero-grid wrap"><div className="hero-copy"><div className="eyebrow"><span></span> CHOKNATEE 2019 LIMITED PARTNERSHIP</div><h1>{content.hero.title}<br/><em>{content.hero.accent}</em>{content.hero.titleEnd}</h1><p>{content.hero.description}</p><div className="hero-actions"><Button asChild className="btn yellow"><a href={phoneHref}>ปรึกษางานกับเรา <ArrowRight size={19}/></a></Button><Button asChild variant="ghost" className="text-link"><a href="#fleet">ดูประเภทรถ <ArrowDownRight size={18}/></a></Button></div><div className="hero-bottom"><div className="round-icon"><HardHat size={22}/></div><div><strong>คุยกับเราได้โดยตรง</strong><small>สอบถามรายละเอียดและประเมินงาน</small></div></div></div><div className="hero-art"><div className="art-top"><span>HEAVY EQUIPMENT</span><span>01 / 03</span></div><div className="art-logo"><img src={content.hero.image} alt="รถแบ็คโฮของโชคนที 2019"/></div><div className="art-label"><span>READY FOR<br/>THE JOB.</span><b>เครื่องจักรพร้อม<br/>สำหรับทุกหน้างาน</b></div><div className="art-number">2019</div></div></div><div className="hero-rail"><div className="wrap rail-inner"><span>BUILT FOR THE WORK AHEAD</span><span>รถแบ็คโฮให้เช่า <i>✳</i> สอบถามรายละเอียดได้เลย</span><span>SCROLL TO EXPLORE ↓</span></div></div></section>
