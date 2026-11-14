@@ -2,8 +2,32 @@
 import { neon } from "@neondatabase/serverless";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { mkdir, writeFile } from "node:fs/promises";
+import path from "node:path";
+import { randomUUID } from "node:crypto";
 import { getAuth } from "@/lib/auth/server";
 import { defaultContent } from "@/lib/default-content";
+
+export async function uploadAdminImage(formData: FormData): Promise<{ok: boolean; message: string; path?: string}> {
+ const auth = getAuth();
+ if (!auth || !process.env.ADMIN_USER_ID) return {ok:false,message:"ยังไม่ได้ตั้งค่าระบบผู้ดูแล"};
+ const {data:session,error} = await auth.getSession();
+ if (error || !session?.user || session.user.id !== process.env.ADMIN_USER_ID) return {ok:false,message:"กรุณาเข้าสู่ระบบอีกครั้ง"};
+ const file = formData.get("image");
+ if (!(file instanceof File) || !file.size) return {ok:false,message:"กรุณาเลือกรูปภาพ"};
+ const extensions: Record<string,string> = {"image/jpeg":"jpg","image/png":"png","image/webp":"webp","image/avif":"avif"};
+ const ext = extensions[file.type];
+ if (!ext) return {ok:false,message:"รองรับไฟล์ JPG, PNG, WebP และ AVIF เท่านั้น"};
+ if (file.size > 8 * 1024 * 1024) return {ok:false,message:"ไฟล์ต้องมีขนาดไม่เกิน 8 MB"};
+ const bytes = Buffer.from(await file.arrayBuffer());
+ const signature = ext === "jpg" ? bytes.subarray(0,3).equals(Buffer.from([0xff,0xd8,0xff])) : ext === "png" ? bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])) : ext === "webp" ? bytes.toString("ascii",8,12) === "WEBP" : bytes.toString("ascii",4,12).includes("ftypavif");
+ if (!signature) return {ok:false,message:"ไฟล์รูปภาพไม่ถูกต้อง"};
+ const filename = `${Date.now()}-${randomUUID()}.${ext}`;
+ const directory = path.join(process.cwd(),"public","uploads");
+ await mkdir(directory,{recursive:true});
+ await writeFile(path.join(directory,filename),bytes,{flag:"wx"});
+ return {ok:true,message:"อัปโหลดรูปแล้ว",path:`/uploads/${filename}`};
+}
 function validShape(value: unknown, sample: unknown, key = ""): boolean {
  if (typeof sample === "string") {
   if (typeof value !== "string" || value.length > 3000) return false;
