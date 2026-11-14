@@ -4,7 +4,8 @@ export async function requestReset(_:string, form:FormData):Promise<string> {
  const auth=getAuth(); const email=process.env.ADMIN_AUTH_EMAIL;
  if (!auth || !email) return "ระบบยังไม่พร้อมใช้งาน";
  const {error}=await auth.requestPasswordReset({email,redirectTo:"https://choknatee-2019.vercel.app/admin/reset"});
- return error ? "ส่งลิงก์ไม่สำเร็จ โปรดติดต่อผู้ดูแลระบบ" : "หากระบบส่งอีเมลสำเร็จ โปรดตรวจสอบกล่องจดหมายของผู้ดูแลและกดลิงก์ตั้งรหัสผ่าน";
+ if (error) console.error("Password reset failed", { code: error.code, message: error.message });
+ return error ? `ส่งลิงก์ไม่สำเร็จ (${error.code || "AUTH_ERROR"})` : "หากระบบส่งอีเมลสำเร็จ โปรดตรวจสอบกล่องจดหมายของผู้ดูแลและกดลิงก์ตั้งรหัสผ่าน";
 }
 export async function resetPassword(_:string, form:FormData):Promise<string> {
  const auth=getAuth(); const token=String(form.get("token") || ""); const password=String(form.get("password") || ""); const confirm=String(form.get("confirm") || "");
